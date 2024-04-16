@@ -15,15 +15,12 @@ HEIGHT = 450
 WIDTH = 400
 ACC = 0.5
 FRIC = -0.12
-FPS = 60
+FPS = 30
 
 # Уставновка времени тика
 FramePerSec = pygame.time.Clock()
 
 # Импорт музыкальных эффектов
-fullname = os.path.join('data', 'pryshok.mp3')
-sound1 = pygame.mixer.Sound(fullname)
-
 pygame.mixer.music.load(os.path.join('data', 'soundtrack2.mp3'))
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play()
@@ -67,12 +64,13 @@ stat_fon = pygame.transform.scale(load_image('StatFon.png'), (WIDTH, HEIGHT))
 # Установка шрифта
 font_name = pygame.font.match_font('arial')
 WHITE = (255, 255, 255)
+RED = (255, 100, 100)
 
 
 # Функция для написания текста
-def draw_text(surf, text, size, x, y):
+def draw_text(surf, text, size, x, y, color):
     font = pygame.font.Font(font_name, size)
-    text_surface = font.render(text, True, WHITE)
+    text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
@@ -96,7 +94,7 @@ def start_game():
         pygame.mixer.music.pause()
     else:
         draw_text(displaysurface, "Никнейм занят!", 22,
-                  WIDTH / 2, 400)
+                  WIDTH / 2, 400, RED)
 
 
 
@@ -149,33 +147,27 @@ def start_screen():
 def RecordStatistic():
     displaysurface.blit(stat_fon, background_rect)
     FullFile = os.path.join('data', 'records.txt')
-    Forma = open(FullFile, mode="rt")
-    FileText = Forma.readlines()
-    thelist_of_highrecords = []
+    with open(FullFile, mode="rt") as Forma:
+        FileText = Forma.readlines()
+
+    # Создаем список кортежей из имен и счетов игроков
+    players = []
+    for line in FileText:
+        parts = line.split(' - ')
+        name = parts[0]
+        score = int(parts[1])
+        players.append((name, score))
+
+    # Сортируем игроков по убыванию их рекорда
+    players.sort(key=lambda x: x[1], reverse=True)
+
+    # Отображаем топ-5 игроков на экране
     probel = 1
-    for i in FileText:
-        FileTexts = i.split(' ')
-        thelist_of_highrecords.append(int(str(FileTexts[3][:-1])))
-        count = 1
-        thelist_of_highrecords = sorted(thelist_of_highrecords)
-        thelist_of_highrecords.reverse()
-        theset_of_highrecords = set()
-    for i in thelist_of_highrecords:
-        theset_of_highrecords.add(i)
-    thelist_of_highrecords = []
-    for i in theset_of_highrecords:
-        thelist_of_highrecords.append(i)
-    thelist_of_highrecords.reverse()
-    for i in thelist_of_highrecords:
-        if count >= 6:
-            break
-        for x in FileText:
-            FileTextu = x.split(' ')
-            if i == int(FileTextu[3]):
-                draw_text(displaysurface, '{} место - {}, счёт: {}'.format(count, FileTextu[1], str(FileTextu[3])), 18,
-                          WIDTH / 2, 185 + probel * 30)
+    for i, (name, score) in enumerate(players[:5], start=1):
+        draw_text(displaysurface, '{} место - {}, счёт: {}'.format(i, name, score), 18,
+                  WIDTH / 2, 185 + probel * 30, WHITE)
         probel += 1
-        count += 1
+
     pygame.display.flip()
     FramePerSec.tick(FPS)
     for event in pygame.event.get():
