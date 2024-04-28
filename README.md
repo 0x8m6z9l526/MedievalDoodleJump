@@ -1,2 +1,2 @@
-# PYGAME-project
-ITS YANDEX PROJECT
+# PyGAME Project
+Work for MIREA Python course
