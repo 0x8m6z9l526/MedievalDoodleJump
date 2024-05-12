@@ -90,7 +90,7 @@ def start_game():
         usedNames.append(FileText[i].split(' ')[1])
     if USER_NAME not in usedNames:
         # Создаем новый процесс для запуска игрового поля
-        subprocess.Popen(["python", "your_game_file.py", USER_NAME])
+        subprocess.Popen(["python", "GameLogic.py", USER_NAME])
         pygame.mixer.music.pause()
     else:
         draw_text(displaysurface, "Никнейм занят!", 22,
@@ -136,12 +136,16 @@ def start_screen():
                     pygame.mouse.get_pos()[1] <= 353:
                 pygame.mixer.music.play()
                 RecordStatistic()
-
                 name = ''
                 text_name = font.render(name, True, (255, 255, 255))
                 displaysurface.blit(text_name, (130, 380))
+            elif event.type == pygame.MOUSEBUTTONDOWN and 308 <= pygame.mouse.get_pos()[0] <= 345 and 125 <= \
+                 pygame.mouse.get_pos()[1] <= 198:
+                terminate()
             pygame.display.flip()
             FramePerSec.tick(FPS)
+
+
 
 
 def RecordStatistic():
